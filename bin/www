@@ -7,8 +7,9 @@
 var app = require('../app');
 var debug = require('debug')('back01:server');
 var http = require('http');
-var config = require('../config/config');
-var models = require('../models');
+
+config = require('../config/config');
+models = require('../models');
 
 /**
  * Get port from environment and store in Express.
@@ -20,17 +21,17 @@ app.set('port', port);
 /**
  * Create HTTP server.
  */
-
 var server = http.createServer(app);
+
 /**
  * Synchronize database
  */
-models.sequelize.sync(config.sequelize.sync).then(function () {
+models.sequelize.sync(config.sequelize.sync).then(() => {
   console.log("Rappi - database synchronized");
   /**
    * Listen on provided port, on all network interfaces.
    */
-  server.listen(port, function () {
+  server.listen(port, () => {
     console.log('Rappi - Server listening on port ' + server.address().port + ' and ready');
     debug('Rappi - Server listening on port ' + server.address().port);
   });
