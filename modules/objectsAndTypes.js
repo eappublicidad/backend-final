@@ -1,7 +1,4 @@
-/* global models, config, locale */
-
-let userUtils = require('../modules/userUtils');
-
+/* global models, config */
 let object = {};
 let utils = {};
 
