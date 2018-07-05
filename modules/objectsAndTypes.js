@@ -408,5 +408,5 @@ utils.cleanArrayKeys = (array, regexp = /\d+/) => {
     return newArray;
 };
 
-module.exports.object = object;
+module.exports = object;
 module.exports.utils = utils;
