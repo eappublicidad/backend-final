@@ -17,11 +17,11 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false
         },
-        nombres: {
+        firstName: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        apellidos: {
+        lastName: {
             type: DataTypes.STRING,
             allowNull: false
         },
@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
         }
     }, {
             // don't add the timestamp attributes (updatedAt, createdAt)
-            timestamps: false,
+            timestamps: true,
 
             // don't use camelcase for automatically added attributes but underscore style
             // so updatedAt will be updated_at
@@ -49,12 +49,12 @@ module.exports = (sequelize, DataTypes) => {
             // Enable optimistic locking.  When enabled, sequelize will add a version count attribute
             // to the model and throw an OptimisticLockingError error when stale instances are saved.
             // Set to true or a string with the attribute name you want to use to enable.
-            version: true
+            version: false
         });
 
     User.associate = models => {
         User.hasMany(models.Cart, {
-            as: 'Cart',
+            as: 'Carts',
             foreignKey: 'user'
         });
     };
