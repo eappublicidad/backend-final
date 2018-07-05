@@ -29,7 +29,7 @@ object.save = (fields, values, objectName, objectTypeName = false, defaultState 
                 .findOne({ where: { id: objectValues.type } })
                 .then(type => {
                     if (!type) {
-                        response.push({ command: 'message', type: "error", content: locale[objectName.toLowerCase()].notExist });
+                        response.push({ command: 'message', type: "error", content: objectName.toLowerCase() + " no existe" });
                         reject(response);
                     } else
                         object.__saveObject(fields, objectValues, objectName)
@@ -59,14 +59,14 @@ object.__saveObject = (fields, values, objectName) => {
             .create(values)
             .then(object => {
                 //se almacena el objeto principal
-                response.push({ command: 'message', type: "info", content: locale[objectName.toLowerCase()].registered });
+                response.push({ command: 'message', type: "info", content: objectName.toLowerCase() + " registrado" });
                 response.push({ command: 'model', type: objectName.toLowerCase(), content: object });
                 resolve(response);
                 return object;
             })
             .then(object => {
                 if (!object) {
-                    response.push({ command: 'message', type: "error", content: locale[objectName.toLowerCase()].registerError });
+                    response.push({ command: 'message', type: "error", content: objectName.toLowerCase() + " error al registrar" });
                     reject(response);
                 }
 
@@ -98,7 +98,7 @@ object.__saveObject = (fields, values, objectName) => {
                 //esta funcion no llama el resolve
             })
             .catch(error => {
-                response.push({ command: 'message', type: "error", content: locale[objectName.toLowerCase()].registerError + error });
+                response.push({ command: 'message', type: "error", content: objectName.toLowerCase() + " arror al registrar" + error });
                 reject(response);
             });
     });
@@ -124,7 +124,7 @@ object.update = (fields, values, objectName, objectTypeName = false, user) => {
                 .findOne({ where: { id: objectValues.type } })
                 .then(type => {
                     if (!type) {
-                        response.push({ command: 'message', type: "error", content: locale[objectTypeName.toLowerCase()].notExist });
+                        response.push({ command: 'message', type: "error", content: objectTypeName.toLowerCase() + " no existe" });
                         reject(response);
                     } else
                         object.__updateObject(fields, values, objectName, user)
@@ -132,7 +132,7 @@ object.update = (fields, values, objectName, objectTypeName = false, user) => {
                             .catch(reject);
                 });
         else
-            object.__updateObject2(fields, values, objectName, user)
+            object.__updateObject(fields, values, objectName, user)
                 .then(resolve)
                 .catch(reject);
     });
@@ -154,7 +154,7 @@ object.__updateObject = (fields, values, objectName, user) => {
             .then(object => {
                 let sameAuthor = true;
                 if (!object) {
-                    response.push({ command: 'message', type: 'error', content: locale[objectName.toLowerCase()].notExist });
+                    response.push({ command: 'message', type: 'error', content: objectTypeName.toLowerCase() + " no existe" });
                     reject(response);
                     return;
                 }
@@ -163,7 +163,7 @@ object.__updateObject = (fields, values, objectName, user) => {
 
                 object.save();
 
-                response.push({ command: 'message', type: "info", content: locale[objectName.toLowerCase()].updated });
+                response.push({ command: 'message', type: "info", content: objectTypeName.toLowerCase() + " actualizada" });
                 response.push({ command: 'model', type: objectName.toLowerCase(), content: object });
                 resolve(response);
                 return object;
@@ -201,7 +201,7 @@ object.__updateObject = (fields, values, objectName, user) => {
                     });
             })
             .catch(error => {
-                response.push({ command: 'message', type: "error", content: locale[objectName.toLowerCase()].updateError });
+                response.push({ command: 'message', type: "error", content: objectTypeName.toLowerCase() + " error al actualizar" });
                 response.push({ command: 'message', type: "system", content: error });
                 reject(response);
             });
@@ -250,7 +250,7 @@ object.get = (objectName, id = 'all', page = 1, user, includes = false, where = 
                                         response.push({ command: 'filter', type: objectName.toLowerCase(), content: filtered.filters });
                                         resolve(response);
                                     } else
-                                        reject([{ command: 'message', type: 'error', content: locale.crud.noResults }]);
+                                        reject([{ command: 'message', type: 'error', content: "sin resultados" }]);
                                 })
                                 .catch(m => {
                                     reject([{ command: 'message', type: 'error', content: m }]);
@@ -259,7 +259,7 @@ object.get = (objectName, id = 'all', page = 1, user, includes = false, where = 
                             resolve([{ command: 'list', type: objectName.toLowerCase(), content: list }]);
                     } else
                         //ya no hay actividades en la pagina solicitada
-                        reject([{ command: 'message', type: 'error', content: locale[objectName.toLowerCase()].noResultsInCurrentPage }]);
+                        reject([{ command: 'message', type: 'error', content: "sin resultados" }]);
                 })
                 .catch(m => {
                     reject([{ command: 'message', type: 'error', content: m }]);
@@ -283,13 +283,13 @@ object.get = (objectName, id = 'all', page = 1, user, includes = false, where = 
                         resolve([{ command: 'model', type: objectName.toLowerCase(), content: object }]);
                     } else
                         //la actividad no existe en la base de datos, se devuelve un mensaje de error
-                        reject([{ command: 'message', type: 'error', content: locale[objectName.toLowerCase()].notExist }]);
+                        reject([{ command: 'message', type: 'error', content: objectName.toLowerCase() + " no existe" }]);
                 })
                 .catch(m => {
                     reject([{ command: 'message', type: 'error', content: m }]);
                 });
         } else
-            reject({ command: 'message', type: 'error', content: sprintf(locale.params.badParameter, { param: id }) });
+            reject({ command: 'message', type: 'error', content: "error" });
     });
 };
 
@@ -314,11 +314,11 @@ object.delete = (req, res, objectName, forced = false) => {
                     object.save();
                 }
 
-                response.push({ command: 'message', type: 'info', content: locale[objectName.toLowerCase()].wasDeleted });
+                response.push({ command: 'message', type: 'info', content: objectName.toLowerCase() + " fue borrado" });
                 res.json({ status: true, response: response });
 
             } else {
-                response.push({ command: 'message', type: 'error', content: locale[objectName.toLowerCase()].notExist });
+                response.push({ command: 'message', type: 'error', content: objectName.toLowerCase() + " no existe" });
                 res.json({ status: false, response: response });
             }
         });
