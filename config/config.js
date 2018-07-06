@@ -1,6 +1,7 @@
 let config = {};
 
-config.application = {}
+config.application = {};
+config.application.host = 'localhost';
 config.application.maxItemsPerPage = 100;
 
 config.database = {};
@@ -10,7 +11,7 @@ config.database.password = "";
 config.database.port = "3306";
 config.database.host = "127.0.0.1";
 config.database.database = "rappi";
-config.database.operatorsAliases = true;
+config.database.operatorsAliases = false;
 
 config.database.pool = {};
 config.database.pool.max = 5;
