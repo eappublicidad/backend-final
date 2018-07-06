@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
         }
     }, {
             // don't add the timestamp attributes (updatedAt, createdAt)
-            timestamps: true,
+            timestamps: false,
 
             // don't use camelcase for automatically added attributes but underscore style
             // so updatedAt will be updated_at

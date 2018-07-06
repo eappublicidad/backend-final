@@ -1,5 +1,8 @@
 let config = {};
 
+config.application = {}
+config.application.maxItemsPerPage = 100;
+
 config.database = {};
 config.database.dialect = "mysql";
 config.database.username = "root";
@@ -18,6 +21,6 @@ config.database.pool.idle = 10000;
 config.sequelize = {};
 config.sequelize.sync = {};
 config.sequelize.sync.force = false;
-//config.sequelize.sync.logging: null;
+config.sequelize.sync.logging = null;
 
 module.exports = config;
