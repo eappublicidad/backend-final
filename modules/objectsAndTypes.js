@@ -12,14 +12,11 @@ let utils = {};
  * @param {String} objectTypeName el nombre del tipo de objeto que se va a guardar, representa la relacion m:1, por defecto es false en caso que no exista dicha relación
  * @param {Integer} defaultState estado por defecto del objeto que será insertado, por defecto el valor es 0
  * */
-object.save = (fields, values, objectName, objectTypeName = false, defaultState = 0, user) => {
+object.save = (fields, values, objectName, objectTypeName = false) => {
     return new Promise((resolve, reject) => {
         let response = [];
 
         let objectValues = utils.assignValues(fields, values);
-
-        objectValues.state = defaultState;
-        objectValues.author = user.id;
 
         if (objectTypeName)
             models[objectTypeName]
@@ -34,7 +31,7 @@ object.save = (fields, values, objectName, objectTypeName = false, defaultState 
                             .catch(reject);
                 });
         else
-            object.__saveObject2(fields, objectValues, objectName)
+            object.__saveObject(fields, objectValues, objectName)
                 .then(resolve)
                 .catch(reject);
     });
@@ -111,7 +108,7 @@ object.__saveObject = (fields, values, objectName) => {
  * @param {Integer} defaultState estado por defecto del objeto que será insertado, por defecto el valor es 0
  * @return {void} no devuelve nada en absoluto
  * */
-object.update = (fields, values, objectName, objectTypeName = false, user) => {
+object.update = (fields, values, objectName, objectTypeName = false) => {
     return new Promise((resolve, reject) => {
         let response = [];
 
@@ -124,12 +121,12 @@ object.update = (fields, values, objectName, objectTypeName = false, user) => {
                         response.push({ command: 'message', type: "error", content: objectTypeName.toLowerCase() + " no existe" });
                         reject(response);
                     } else
-                        object.__updateObject(fields, values, objectName, user)
+                        object.__updateObject(fields, values, objectName)
                             .then(resolve)
                             .catch(reject);
                 });
         else
-            object.__updateObject(fields, values, objectName, user)
+            object.__updateObject(fields, values, objectName)
                 .then(resolve)
                 .catch(reject);
     });
@@ -143,15 +140,14 @@ object.update = (fields, values, objectName, objectTypeName = false, user) => {
  * @param {String} objectName el nombre del Modelo que se va a guardar
  * @return {void} no devuelve nada en absoluto
  * */
-object.__updateObject = (fields, values, objectName, user) => {
+object.__updateObject = (fields, values, objectName) => {
     return new Promise((resolve, reject) => {
         let response = [];
         models[objectName]
             .findOne({ where: { id: values.id } })
             .then(object => {
-                let sameAuthor = true;
                 if (!object) {
-                    response.push({ command: 'message', type: 'error', content: objectTypeName.toLowerCase() + " no existe" });
+                    response.push({ command: 'message', type: 'error', content: objectName.toLowerCase() + " no existe" });
                     reject(response);
                     return;
                 }
@@ -160,7 +156,7 @@ object.__updateObject = (fields, values, objectName, user) => {
 
                 object.save();
 
-                response.push({ command: 'message', type: "info", content: objectTypeName.toLowerCase() + " actualizada" });
+                response.push({ command: 'message', type: "info", content: objectName.toLowerCase() + " actualizada" });
                 response.push({ command: 'model', type: objectName.toLowerCase(), content: object });
                 resolve(response);
                 return object;
@@ -193,6 +189,7 @@ object.__updateObject = (fields, values, objectName, user) => {
                                 for (let j in childObjects)
                                     if (extras[child.field][childObjects[j].id])
                                         childObjects[j][`${objectName}_${child.model}`] = extras[child.field][childObjects[j].id];
+
                                 object[`set${child.as}`](childObjects);
                             });
                     });
@@ -213,7 +210,7 @@ object.__updateObject = (fields, values, objectName, user) => {
  * @param {Array} includes la lista de includes que debe tener el objeto que se va a consultar, eso en caso que requieran que los objetos compuestos sean parte del resultado, por defecto es false y en ese caso solo se obtiene el objeto a consultar y no sus componentes complejos
  * @return {void} no devuelve nada en absoluto
  * */
-object.get = (objectName, id = 'all', page = 1, user, includes = false, where = false, filter = false, order = false) => {
+object.get = (objectName, id = 'all', page = 1, includes = false, where = false, filter = false, order = false) => {
     return new Promise((resolve, reject) => {
         if (/all/i.test(id)) {
             page = page ? parseInt(page - 1) : 0;
@@ -239,7 +236,7 @@ object.get = (objectName, id = 'all', page = 1, user, includes = false, where = 
                 .then(list => {
                     if (list && list.length > 0) {
                         if (filter && filter.callback) {
-                            return filter.callback(list, filter.params, user)
+                            return filter.callback(list, filter.params)
                                 .then(filtered => {
                                     let response = [];
                                     if (filtered.list.length > 0) {
@@ -249,8 +246,8 @@ object.get = (objectName, id = 'all', page = 1, user, includes = false, where = 
                                     } else
                                         reject([{ command: 'message', type: 'error', content: "sin resultados" }]);
                                 })
-                                .catch(m => {
-                                    reject([{ command: 'message', type: 'error', content: m }]);
+                                .catch(message => {
+                                    reject([{ command: 'message', type: 'error', content: message }]);
                                 });
                         } else
                             resolve([{ command: 'list', type: objectName.toLowerCase(), content: list }]);
@@ -298,27 +295,23 @@ object.get = (objectName, id = 'all', page = 1, user, includes = false, where = 
  * @param {Boolean} forced indica si el borrado es lógico o real, si es true, se hace el borrado real
  * @return {void} no devuelve nada en absoluto
  * */
-object.delete = (req, res, objectName, forced = false) => {
-    let response = new Array();
-    models[objectName]
-        .findOne({ where: { id: req.params.id } })
-        .then(object => {
-            if (object) {
-                if (forced)
+object.delete = (objectName, id) => {
+    return new Promise((resolve, reject) => {
+        let response = new Array();
+        models[objectName]
+            .findOne({ where: { id } })
+            .then(object => {
+                if (object) {
                     object.destroy({ force: true });
-                else {
-                    object.state = models[objectName].STATE_ERASED;
-                    object.save();
+
+                    response.push({ command: 'message', type: 'info', content: objectName.toLowerCase() + " fue borrado" });
+                    resolve(response);
+                } else {
+                    response.push({ command: 'message', type: 'error', content: objectName.toLowerCase() + " no existe" });
+                    reject(response);
                 }
-
-                response.push({ command: 'message', type: 'info', content: objectName.toLowerCase() + " fue borrado" });
-                res.json({ status: true, response: response });
-
-            } else {
-                response.push({ command: 'message', type: 'error', content: objectName.toLowerCase() + " no existe" });
-                res.json({ status: false, response: response });
-            }
-        });
+            });
+    });
 };
 
 /**
