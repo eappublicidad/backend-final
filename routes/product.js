@@ -4,7 +4,12 @@ var object = require('../modules/objectsAndTypes');
 
 /* GET users listing. */
 router.get('/:id', (req, res, next) => {
-  object.get('Product', req.params.id, 1, null)
+  let include = {};
+
+  include.id = [{ model: models.Category, as: 'Category' }];
+  include.all = [{ model: models.Category, as: 'Category' }];
+
+  object.get('Product', req.params.id, 1, include)
     .then(response => {
       res.json({ status: true, content: response });
     })
@@ -14,7 +19,7 @@ router.get('/:id', (req, res, next) => {
 });
 
 router.post('/save', (req, res, next) => {
-  object.save(['name', 'description', 'price'], req.body, 'Product')
+  object.save(['name', 'description', 'price', 'category'], req.body, 'Product')
     .then(response => {
       res.json({ status: true, content: response });
     })
@@ -25,7 +30,7 @@ router.post('/save', (req, res, next) => {
 
 router.put('/save/:id', (req, res, next) => {
   req.body.id = req.params.id;
-  object.update(['name', 'description', 'price'], req.body, 'Product')
+  object.update(['name', 'description', 'price', 'category'], req.body, 'Product')
     .then(response => {
       res.json({ status: true, content: response });
     })
