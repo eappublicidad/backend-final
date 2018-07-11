@@ -56,4 +56,24 @@ router.delete('/delete/:id', (req, res, next) => {
     });
 });
 
+router.post('/login', (req, res, next) => {
+  models.User.findOne({
+    where: {
+      email: req.body.email,
+      password: req.body.password
+    }
+  }).then(user => {
+    if (user) {
+      if (!user.token) {
+        user.token = "alirgvesilgunaergnulanlkae";
+        user.save();
+      }
+
+      res.json({ status: true, content: user });
+    } else {
+      res.json({ status: true, content: "usuario no existe" });
+    }
+  });
+});
+
 module.exports = router;

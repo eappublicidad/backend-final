@@ -29,6 +29,10 @@ module.exports = (sequelize, DataTypes) => {
         birthday: {
             type: DataTypes.DATE,
             allowNull: false
+        },
+        token: {
+            type: DataTypes.STRING,
+            allowNull: true
         }
     }, {
             // don't add the timestamp attributes (updatedAt, createdAt)
