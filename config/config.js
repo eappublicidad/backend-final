@@ -24,4 +24,7 @@ config.sequelize.sync = {};
 config.sequelize.sync.force = false;
 config.sequelize.sync.logging = null;
 
+config.crypto = {};
+config.crypto.salt = "o8ynw4v5opym5pq98y oq w6 j{w5{6´j w{56o,jw4pi6mjr46w59phu69q4n5hñq45hñq3";
+
 module.exports = config;

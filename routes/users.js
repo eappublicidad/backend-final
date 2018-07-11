@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var object = require('../modules/objectsAndTypes');
+var crypto = require('crypto');
 
 /* GET users listing. */
 router.get('/:id', passport.authenticate('bearer', { session: false }), (req, res, next) => {
@@ -65,9 +66,9 @@ router.post('/login', (req, res, next) => {
   }).then(user => {
     if (user) {
       if (!user.token) {
-        user.token = "alirgvesilgunaergnulanlkae";
-
-        req.session.user = user;
+        user.token = crypto.createHmac('sha256', config.crypto.salt)
+          .update((Math.random() * 1000 + ""))
+          .digest('hex');
 
         user.save();
       }
