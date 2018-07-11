@@ -3,7 +3,7 @@ var router = express.Router();
 var object = require('../modules/objectsAndTypes');
 
 /* GET users listing. */
-router.get('/:id', (req, res, next) => {
+router.get('/:id', passport.authenticate('bearer', { session: false }), (req, res, next) => {
   object.get('User', req.params.id, 1, null)
     .then(response => {
       res.json({ status: true, content: response });
@@ -66,6 +66,9 @@ router.post('/login', (req, res, next) => {
     if (user) {
       if (!user.token) {
         user.token = "alirgvesilgunaergnulanlkae";
+
+        req.session.user = user;
+
         user.save();
       }
 

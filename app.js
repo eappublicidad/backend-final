@@ -3,7 +3,9 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var sessionVerifier = require('./modules/session-verifier');
+
+//var sessionVerifier = require('./modules/session-verifier');
+require('./modules/authentication-verifier');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -11,8 +13,6 @@ var productRouter = require('./routes/product');
 var categoryRouter = require('./routes/category');
 
 var app = express();
-
-require('./modules/authentication-verifier');
 
 app.use(logger('dev'));
 app.use(express.json());
