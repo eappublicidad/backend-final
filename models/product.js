@@ -23,6 +23,10 @@ module.exports = (sequelize, DataTypes) => {
         price: {
             type: DataTypes.INTEGER,
             allowNull: false
+        },
+        image: {
+            type: DataTypes.STRING,
+            allowNull: true
         }
     }, {
             // don't add the timestamp attributes (updatedAt, createdAt)
