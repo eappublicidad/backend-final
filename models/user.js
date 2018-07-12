@@ -1,5 +1,7 @@
 "use strict";
 
+var crypto = require('crypto');
+
 module.exports = (sequelize, DataTypes) => {
     let User = sequelize.define('User', {
         id: {
@@ -15,7 +17,15 @@ module.exports = (sequelize, DataTypes) => {
         },
         password: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: false,
+            get() {
+                return "*****";
+            },
+            set(password) {
+                this.setDataValue('password', crypto.createHmac('sha256', config.crypto.salt)
+                    .update(password)
+                    .digest('hex'));
+            }
         },
         firstName: {
             type: DataTypes.STRING,

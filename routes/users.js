@@ -26,6 +26,7 @@ router.post('/save', (req, res, next) => {
       res.json({ status: true, content: response });
     })
     .catch(response => {
+      console.log(response);
       res.json({ status: false, content: response });
     });
 });
@@ -58,10 +59,14 @@ router.delete('/delete/:id', (req, res, next) => {
 });
 
 router.post('/login', (req, res, next) => {
+  var passwordHash = crypto.createHmac('sha256', config.crypto.salt)
+    .update(req.body.password)
+    .digest('hex');
+
   models.User.findOne({
     where: {
       email: req.body.email,
-      password: req.body.password
+      password: passwordHash
     }
   }).then(user => {
     if (user) {
