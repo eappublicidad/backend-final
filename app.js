@@ -7,6 +7,7 @@ var logger = require('morgan');
 //var sessionVerifier = require('./modules/session-verifier');
 require('./modules/authentication-verifier');
 
+var allRouter = require('./routes/all');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var productRouter = require('./routes/product');
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(allRouter);
 app.use('/', indexRouter);
 app.use('/user', usersRouter);
 app.use('/product', productRouter);
