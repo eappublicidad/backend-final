@@ -80,7 +80,7 @@ router.post('/login', (req, res, next) => {
 
       res.json({ status: true, content: user });
     } else {
-      res.json({ status: true, content: "usuario no existe" });
+      res.json({ status: false, content: "usuario no existe" });
     }
   });
 });
